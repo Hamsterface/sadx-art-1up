@@ -1,5 +1,8 @@
 #include "pch.h"
+#include "IniFile.hpp"
 // or #include "stdafx.h" for previous Visual Studio versions
+
+#define ReplacePVM(a, b) helperFunctions.ReplaceFile("system\\" a ".PVM", "system\\" b ".PVM")
 
 extern "C"
 {
@@ -7,52 +10,26 @@ extern "C"
 	{
 		// Executed at startup, contains helperFunctions and the path to your mod (useful for getting the config file.)
 		// This is where we override functions, replace static data, etc.
+		const IniFile* config = new IniFile(std::string(path) + "\\config.ini");
 
-	}
+		bool borders = config->getBool("", "Borders", true);
+		bool altSuper = config->getBool("", "AltSuper", false);
+		if (!borders) {
+			ReplacePVM("OBJ_REGULAR", "OBJ_REGULAR_NOBORDER");
 
-	__declspec(dllexport) void __cdecl OnInitEnd()
-	{
-		// Executed after every mod has been initialized, mainly used to check if a specific mod is also enabled.
-	}
-
-	__declspec(dllexport) void __cdecl OnFrame()
-	{
-		// Executed every running frame of SADX
-	}
-
-	__declspec(dllexport) void __cdecl OnInput()
-	{
-		// Executed before the game processes input
-	}
-
-	__declspec(dllexport) void __cdecl OnControl()
-	{
-		// Executed when the game processes input
-	}
-
-	__declspec(dllexport) void __cdecl OnRenderDeviceReset()
-	{
-		// Executed when the window size changes
-	}
-
-	__declspec(dllexport) void __cdecl OnRenderDeviceLost()
-	{
-		// Executed when the game fails to render the scene
-	}
-
-	__declspec(dllexport) void __cdecl OnRenderSceneStart()
-	{
-		// Executed before the game starts rendering the scene
-	}
-
-	__declspec(dllexport) void __cdecl OnRenderSceneEnd()
-	{
-		// Executed when the game finishes rendering the scene
-	}
-
-	__declspec(dllexport) void __cdecl OnExit()
-	{
-		// Executed when the game is about to terminate
+			if (altSuper) {
+				ReplacePVM("SUPERSONIC_EXTRA", "SUPERSONIC_EXTRA_ALTERNATE_NOBORDER");
+			}
+			else {
+				ReplacePVM("SUPERSONIC_EXTRA", "SUPERSONIC_EXTRA_NOBORDER");
+			}
+		}
+		else {
+			ReplacePVM("OBJ_REGULAR", "OBJ_REGULAR_HD"); // Redundant with HD GUI but ensures compatibility
+			if (altSuper) {
+				ReplacePVM("SUPERSONIC_EXTRA", "SUPERSONIC_EXTRA_ALTERNATE");
+			}
+		}
 	}
 
 	__declspec(dllexport) ModInfo SADXModInfo = { ModLoaderVer }; // This is needed for the Mod Loader to recognize the DLL.

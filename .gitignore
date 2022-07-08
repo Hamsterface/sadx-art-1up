@@ -36,3 +36,4 @@
 
 # Builds
 /Release/
+bin/ModLoaderCommon.pdb
